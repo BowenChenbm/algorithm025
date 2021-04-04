@@ -1,9 +1,9 @@
 # merge two sorted array
 # 给你两个有序整数数组 nums1 和 nums2，请你将 nums2 合并到 nums1 中，使 nums1 成为一个有序数组。
-# 暴力: 合并后排序nums1[:] = sorted(nums1[:m] + nums2)
+#1， 暴力: 合并后排序nums1[:] = sorted(nums1[:m] + nums2)
 class Solution:
     def merge(self, nums1: List[int], m: int, nums2: List[int], n: int) -> None:
-        # 双指针1, 从前往后
+        #2， 双指针1, 从前往后
         # nums1Copy = nums1[:m]
         # nums1[:] = []
         # i = 0
@@ -18,7 +18,7 @@ class Solution:
         # if i < m: nums1[i+j:] = nums1Copy[i:]
         # if j < n: nums1[i+j:] = nums2[j:]
         
-        #双指针2，从后往前，节约临时空间数组
+        #3，双指针2，从后往前，节约临时空间数组
         p1 = m - 1
         p2 = n - 1
         end_p = m + n - 1
