@@ -1,23 +1,41 @@
 ﻿学习笔记
-这周内容有点多，要记好多东西T_T，中间遇到了不少难理解的地方：
-Trie：
-在python 的模板中，一开始没理解这里：
-for char in word:
-    node = node.setdefault(char, {})
+这周内容虽然不多，但是需要练习的BFS和启发式搜索，中间遇到了不少难的地方：
 
-尝试把node和root打印出来后，才发现存储的形式为：{'a': {'b': {'s': {'#': True}}}}， 原因是在setdefault返回的是第二个参数的{}，这里刚好是个字典，node接收到这个字典的地址就等于在里面重新开启一个储存位置紧接着检查下一个，直到遇到end_of_word. 中间不存实际单词，每一层key串起来才是我们要的单词。
-总结：每个函数或者方法返回的东东，都要看清楚返回的是值还是其他东西。
+剪枝：本质就是在递归中参加条件，避免重复访问。但是关于剪枝的策略，很多时候即便有意识，但是也找不着套路和方向。
+双向BFS：已知起点和终点，可以从两端往中间扩散。单词接龙那题，照着题解写的双向BFS，不知道为什么经常报超出时间：
+class Solution:
+    def ladderLength(self, beginWord: str, endWord: str, wordList: List[str]) -> int:
+        word_set = set(wordList)
+        if len(word_set) == 0 or endWord not in word_set: return 0
+        if beginWord in word_set: word_set.remove(beginWord)
 
-并查集：
-听超哥讲的有点懵，找到了B站这个视频讲的比较好https://www.bilibili.com/video/BV13t411v7Fs?p=1， 更容易理解。
+        visited, front_visited, end_visited = set(), set(), set()
+        visited.add(beginWord)
+        visited.add(endWord)
 
-剪枝：本质就是在递归中参加条件，避免重复访问。
-双向BFS：已知起点和终点，可以从两端往中间扩散。
-启发式搜索A*： piority queue，估价函数，好多很棒（太长）的文章，有空回来再慢慢看。
+        front_visited.add(beginWord)
+        end_visited.add(endWord)
 
-红黑树和AVL树：
-只需要记住概念和重点：
-Lookup: AVL > RedBlackTrees
-Inter insertion and removal: AVL < RedBlackTrees
-store: AVL > RedBlackTrees
-AVL used in database where faster retrievals required
+        word_len = len(beginWord)
+        step = 1
+        while front_visited:
+            if len(front_visited) > len(end_visited): # 取小的进行下面的 while 方便编码
+                front_visited, end_visited = end_visited, front_visited
+            next_visited = set()
+            for word in front_visited:
+                temp_word = list(word)
+                for j in range(word_len):
+                    original_char = temp_word[j]
+                    for k in range(26):
+                        temp_word[j] = chr(ord('a') + k)
+                        nextone = ''.join(temp_word)
+                        if nextone in word_set:
+                            if nextone in end_visited:
+                                return step + 1  #碰到另一端有访问过就找到了，直接return step +1
+                            if nextone not in visited:
+                                next_visited.add(nextone)
+                    temp_word[j] = original_char
+            front_visited = next_visited
+            step += 1
+        return 0
+启发式搜索A*： piority queue，估价函数有些难理解，好多很棒（太长）的文章，有空回来再慢慢看。
